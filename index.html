@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>STUDY BACK | 勉強習慣アプリ</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--ink:#172033;--muted:#667085;--accent:#625bf6;--accent2:#e9e7ff;--green:#16845b;--line:#e7eaf0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:20px 16px 36px}
+header{display:flex;justify-content:space-between;align-items:center;margin:4px 0 20px}
+.brand{font-weight:850;letter-spacing:.08em;font-size:20px}
+.tag{font-size:12px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 10px}
+h1{font-size:25px;line-height:1.3;margin:8px 0}
+.subtitle{color:var(--muted);font-size:14px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 4px 16px #19234a08}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card h2{font-size:16px;margin:0}
+.eyebrow{font-size:12px;color:var(--muted);margin-bottom:6px}
+.time{font-size:48px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;text-align:center;margin:14px 0 2px}
+.timer-note{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px}
+.actions{display:flex;gap:9px}
+button{border:0;border-radius:12px;padding:13px 15px;font-size:15px;font-weight:700;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #aaa5ff;outline-offset:2px}
+.primary{background:var(--accent);color:#fff;flex:1}
+.secondary{background:#f0f1f6;color:var(--ink)}
+.small{padding:9px 11px;font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#f7f8fc;border-radius:14px;padding:13px}
+.stat .num{font-size:22px;font-weight:800;margin-top:4px}
+.progress{height:9px;border-radius:99px;background:#eceef5;overflow:hidden;margin:14px 0 8px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#625bf6,#938cff);border-radius:99px;transition:width .25s}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+label{font-size:13px;color:var(--muted)}
+input[type=number]{width:90px;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:16px}
+.reward{background:var(--accent2);border:1px solid #d9d5ff;border-radius:15px;padding:14px;margin-top:14px}
+.reward strong{display:block;margin-bottom:4px}
+.reward p{margin:0;font-size:13px;line-height:1.6;color:#4c4785}
+.history{margin:10px 0 0;padding:0;list-style:none}
+.history li{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.history li:last-child{border-bottom:0}
+.empty{font-size:13px;color:var(--muted);padding:10px 0}
+footer{color:var(--muted);font-size:11px;line-height:1.6;text-align:center;padding:10px}
+.notice{font-size:12px;color:var(--muted);line-height:1.6}
+@media(min-width:500px){.app{padding-top:28px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="brand">STUDY BACK</div>
+    <div class="tag">プロトタイプ v0.1</div>
+  </header>
+  <h1>今日も、少しずつ前へ。</h1>
+  <p class="subtitle">勉強を記録して、続ける習慣をつくろう。</p>
+
+  <section class="card" aria-labelledby="timer-title">
+    <div class="card-head">
+      <h2 id="timer-title">集中タイマー</h2>
+      <span class="tag" id="timerState">準備OK</span>
+    </div>
+    <div class="time" id="clock" aria-live="off">00:00:00</div>
+    <div class="timer-note" id="timerNote">勉強を始めたらスタート</div>
+    <div class="actions">
+      <button class="primary" id="startPause">勉強スタート</button>
+      <button class="secondary" id="finish" disabled>記録して終了</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="goal-title">
+    <div class="card-head">
+      <h2 id="goal-title">今週の目標</h2>
+      <button class="secondary small" id="saveGoal">目標を保存</button>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <div>
+        <div class="eyebrow">週の勉強時間</div>
+        <div style="font-size:14px">目標を自分で設定しよう</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input id="goalHours" type="number" min="1" max="100" step="1" value="5" aria-label="週間目標時間">
+        <span>時間</span>
+      </div>
+    </div>
+    <div class="progress" role="progressbar" aria-label="週間目標の達成率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="bar" id="bar"></div></div>
+    <div class="row">
+      <span class="notice" id="progressText">0分 / 5時間</span>
+      <strong id="progressPct">0%</strong>
+    </div>
+    <div class="reward" id="rewardBox">
+      <strong id="rewardTitle">今週の目標を決めよう</strong>
+      <p id="rewardText">勉強時間を記録すると、ここに達成状況が表示されます。</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>今日のポイント</h2>
+      <span class="tag">1時間＝50pt</span>
+    </div>
+    <div class="stats" style="margin-top:14px">
+      <div class="stat"><div class="eyebrow">今日の獲得ポイント</div><div class="num" id="todayPoints">0 pt</div></div>
+      <div class="stat"><div class="eyebrow">今日の勉強時間</div><div class="num" id="todayStudyTime">0分</div></div>
+    </div>
+    <div class="progress" role="progressbar" aria-label="1日のポイント上限に対する達成率" aria-valuemin="0" aria-valuemax="500" aria-valuenow="0" id="dailyProgressBar"><div class="bar" id="dailyBar"></div></div>
+    <div class="row">
+      <span class="notice" id="dailyProgressText">1日の上限まで500 pt</span>
+      <strong>上限 500 pt/日</strong>
+    </div>
+    <p class="notice" style="margin-bottom:0;margin-top:10px">勉強時間に応じてポイントが増えます。1日10時間分（最大500pt）まで。ポイントは試作品内の計算で、実際のお金の支払い・返金はありません。</p>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>学習サマリー</h2>
+      <span class="tag">今週</span>
+    </div>
+    <div class="stats" style="margin-top:14px">
+      <div class="stat"><div class="eyebrow">勉強した時間</div><div class="num" id="totalTime">0分</div></div>
+      <div class="stat"><div class="eyebrow">勉強した日数</div><div class="num" id="daysCount">0日</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>最近の勉強記録</h2>
+      <button class="secondary small" id="clearHistory">記録をリセット</button>
+    </div>
+    <ul class="history" id="history"><li class="empty">まだ記録はありません。最初の勉強を記録しよう！</li></ul>
+  </section>
+
+  <footer>
+    試作品のため、勉強時間とポイントはこのブラウザ内に保存されます。端末やブラウザを変えると共有されません。<br>
+    ポイントは1時間50pt・1日最大500ptのデモ計算です。実際の課金・返金・支払いは行いません。
+  </footer>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const STORAGE_KEY = 'study-back-prototype-v1';
+  let data = { goalHours: 5, sessions: [] };
+  let running = false;
+  let startedAt = 0;
+  let accumulatedMs = 0;
+  let tickHandle = null;
+
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (saved && Array.isArray(saved.sessions)) data = {...data, ...saved};
+    } catch (_) {}
+    $('goalHours').value = data.goalHours || 5;
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch (_) { /* local storage may be unavailable in private mode */ }
+  }
+  function startOfWeek(date) {
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    const day = (d.getDay() + 6) % 7; // Monday start
+    d.setDate(d.getDate() - day);
+    return d;
+  }
+  function inThisWeek(iso) {
+    const d = new Date(iso);
+    const start = startOfWeek(new Date());
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    return d >= start && d < end;
+  }
+  function formatDuration(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h,m,s].map(n => String(n).padStart(2,'0')).join(':');
+  }
+  function formatShort(ms) {
+    const mins = Math.round(ms / 60000);
+    const h = Math.floor(mins / 60), m = mins % 60;
+    if (h && m) return `${h}時間${m}分`;
+    if (h) return `${h}時間`;
+    return `${m}分`;
+  }
+  function weeklySessions() { return data.sessions.filter(s => inThisWeek(s.date)); }
+  function weeklyMs() { return weeklySessions().reduce((sum,s) => sum + s.durationMs, 0); }
+  function isToday(iso) {
+    const d = new Date(iso), now = new Date();
+    return d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate();
+  }
+  function todaySessions() { return data.sessions.filter(s => isToday(s.date)); }
+  function todayEligibleMs() {
+    return Math.min(10 * 3600000, todaySessions().reduce((sum, s) => sum + (s.eligibleMs ?? s.durationMs), 0));
+  }
+  function todayPoints() {
+    return Math.floor(todayEligibleMs() / 3600000 * 50);
+  }
+  function currentSessionEligibleMs() {
+    const todayMs = todaySessions().reduce((sum, s) => sum + (s.eligibleMs ?? s.durationMs), 0);
+    const elapsed = accumulatedMs + (running ? Date.now() - startedAt : 0);
+    return Math.min(elapsed, Math.max(0, 10 * 3600000 - todayMs));
+  }
+  function renderTimer() {
+    const elapsed = accumulatedMs + (running ? Date.now() - startedAt : 0);
+    $('clock').textContent = formatDuration(elapsed);
+    const eligible = currentSessionEligibleMs();
+    const sessionPoints = Math.floor(eligible / 3600000 * 50);
+    $('startPause').textContent = running ? '一時停止' : (elapsed > 0 ? '再開する' : '勉強スタート');
+    $('timerNote').textContent = running
+      ? `このセッション：約${sessionPoints} pt獲得予定（1日最大500 pt）`
+      : (elapsed > 0 ? `一時停止中・約${sessionPoints} pt獲得予定` : '勉強を始めたらスタート');
+    $('finish').disabled = elapsed < 1000;
+    $('timerState').textContent = running ? '計測中' : (elapsed > 0 ? '一時停止中' : '準備OK');
+    if (!running && elapsed === 0) $('timerNote').textContent = '勉強を始めたらスタート';
+  }
+  function render() {
+    const goalHours = Math.max(1, Math.min(100, Number(data.goalHours) || 5));
+    const goalMs = goalHours * 3600000;
+    const ms = weeklyMs();
+    const pct = Math.min(100, Math.floor(ms / goalMs * 100));
+    const sessions = weeklySessions();
+    const days = new Set(sessions.map(s => new Date(s.date).toLocaleDateString('ja-JP'))).size;
+    $('totalTime').textContent = formatShort(ms);
+    $('daysCount').textContent = `${days}日`;
+    const todayMs = todayEligibleMs();
+    const points = todayPoints();
+    const dailyPct = Math.min(100, todayMs / (10 * 3600000) * 100);
+    $('todayPoints').textContent = `${points} pt`;
+    $('todayStudyTime').textContent = formatShort(todayMs);
+    $('dailyBar').style.width = `${dailyPct}%`;
+    $('dailyProgressBar').setAttribute('aria-valuenow', String(Math.round(todayMs / 3600000 * 50)));
+    $('dailyProgressText').textContent = points >= 500 ? '今日の上限に到達！' : `上限まであと${500 - points} pt`;
+    $('bar').style.width = `${pct}%`;
+    $('progressBar').setAttribute('aria-valuenow', String(pct));
+    $('progressText').textContent = `${formatShort(ms)} / ${goalHours}時間`;
+    $('progressPct').textContent = `${pct}%`;
+    if (ms >= goalMs) {
+      $('rewardTitle').textContent = '🎉 週間目標を達成！';
+      $('rewardText').textContent = 'おめでとう！デモ上で目標達成です。返金条件の表示を試しているだけで、実際の返金は発生しません。';
+    } else {
+      $('rewardTitle').textContent = '目標まであと少し';
+      $('rewardText').textContent = `あと${formatShort(goalMs - ms)}で今週の目標達成。少しずつ積み上げよう！`;
+    }
+    const list = $('history');
+    list.innerHTML = '';
+    const recent = [...data.sessions].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,8);
+    if (!recent.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'まだ記録はありません。最初の勉強を記録しよう！';
+      list.appendChild(li);
+    } else {
+      recent.forEach(s => {
+        const li = document.createElement('li');
+        const left = document.createElement('span');
+        const right = document.createElement('strong');
+        left.textContent = new Date(s.date).toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        right.textContent = formatShort(s.durationMs);
+        li.append(left,right); list.appendChild(li);
+      });
+    }
+    renderTimer();
+  }
+  $('startPause').addEventListener('click', () => {
+    if (running) {
+      accumulatedMs += Date.now() - startedAt;
+      running = false;
+      clearInterval(tickHandle);
+      tickHandle = null;
+    } else {
+      running = true;
+      startedAt = Date.now();
+      tickHandle = setInterval(renderTimer, 250);
+    }
+    renderTimer();
+  });
+  $('finish').addEventListener('click', () => {
+    if (running) {
+      accumulatedMs += Date.now() - startedAt;
+      running = false;
+      clearInterval(tickHandle);
+      tickHandle = null;
+    }
+    if (accumulatedMs < 1000) return;
+    const todayAlreadyMs = todaySessions().reduce((sum, s) => sum + (s.eligibleMs ?? s.durationMs), 0);
+    const eligibleMs = Math.min(accumulatedMs, Math.max(0, 10 * 3600000 - todayAlreadyMs));
+    data.sessions.push({date:new Date().toISOString(), durationMs:accumulatedMs, eligibleMs});
+    accumulatedMs = 0;
+    startedAt = 0;
+    save();
+    render();
+  });
+  $('saveGoal').addEventListener('click', () => {
+    const value = Number($('goalHours').value);
+    if (!Number.isFinite(value) || value < 1 || value > 100) {
+      alert('目標は1〜100時間で設定してください。');
+      return;
+    }
+    data.goalHours = Math.round(value);
+    $('goalHours').value = data.goalHours;
+    save(); render();
+  });
+  $('clearHistory').addEventListener('click', () => {
+    if (!confirm('学習記録と目標をリセットしますか？')) return;
+    data = {goalHours:5, sessions:[]};
+    accumulatedMs = 0; startedAt = 0; running = false;
+    clearInterval(tickHandle); tickHandle = null;
+    save(); $('goalHours').value = 5; render();
+  });
+  load(); render();
+})();
+</script>
+</body>
+</html>
